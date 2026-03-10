@@ -7,11 +7,20 @@
   <style>
     /* ── palette ── */
     :root {
-      --bg:      #ede8e3;
-      --plum:    #3d2a30;
-      --plum-mid:#5a3d44;
-      --red:     #ff2c0b;
-      --muted:   #8c7e7a;
+      --bg:        #ede8e3;
+      --plum:      #3d2a30;
+      --plum-mid:  #5a3d44;
+      --red:       #ff2c0b;
+      --muted:     #8c7e7a;
+      --transition: 0.4s ease;
+    }
+
+    html[data-theme="dark"] {
+      --bg:       #1c1017;
+      --plum:     #f0e6e0;
+      --plum-mid: #c9a9a0;
+      --red:      #ff4d2e;
+      --muted:    #7a5f65;
     }
 
     @font-face {
@@ -45,7 +54,31 @@
       flex-direction: column;
       align-items: center;
       padding: 0 1.5rem 6rem;
+      transition: background var(--transition), color var(--transition);
     }
+
+    /* ── theme toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 1.4rem;
+      right: 1.5rem;
+      z-index: 100;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.3rem;
+      color: var(--muted);
+      opacity: 0.7;
+      transition: opacity 0.2s ease, color var(--transition);
+      line-height: 0;
+    }
+    .theme-toggle:hover { opacity: 1; }
+    .theme-toggle svg { width: 17px; height: 17px; fill: currentColor; }
+
+    .theme-toggle .icon-moon { display: block; }
+    .theme-toggle .icon-sun  { display: none;  }
+    html[data-theme="dark"] .theme-toggle .icon-moon { display: none;  }
+    html[data-theme="dark"] .theme-toggle .icon-sun  { display: block; }
 
     /* ── shared section wrapper ── */
     .section {
@@ -63,6 +96,7 @@
       text-transform: uppercase;
       color: var(--muted);
       margin-bottom: 1.5rem;
+      transition: color var(--transition);
     }
 
     /* ════════════════════════════
@@ -97,6 +131,11 @@
       object-fit: cover;
       position: absolute;
       inset: 0;
+      transition: filter var(--transition);
+    }
+
+    html[data-theme="dark"] .photo-frame img {
+      filter: brightness(0.85) saturate(0.85);
     }
 
     .hero-name {
@@ -106,6 +145,7 @@
       line-height: 1.05;
       text-align: center;
       color: var(--red);
+      transition: color var(--transition);
     }
 
     .hero > div {
@@ -121,10 +161,12 @@
       font-size: 1.15rem;
       line-height: 1.85;
       color: var(--plum);
+      transition: color var(--transition);
     }
 
     .bio-text .highlight {
       color: var(--red);
+      transition: color var(--transition);
     }
 
     /* ════════════════════════════
@@ -160,13 +202,19 @@
       height: 100%;
       object-fit: cover;
       display: block;
+      transition: filter var(--transition);
+    }
+
+    html[data-theme="dark"] .media-card .cover img {
+      filter: brightness(0.85) saturate(0.85);
     }
 
     .media-card .note {
-      border-top: 16px solid var(--bg); 
+      border-top: 16px solid var(--bg);
       font-size: 0.82rem;
       color: var(--plum-mid);
       line-height: 1.5;
+      transition: border-color var(--transition), color var(--transition);
     }
 
     /* ── footer ── */
@@ -177,6 +225,7 @@
       letter-spacing: 0.1em;
       text-align: center;
       opacity: 0.6;
+      transition: color var(--transition);
     }
 
     .footer-icons {
@@ -189,7 +238,7 @@
     .footer-icons a {
       color: var(--muted);
       opacity: 0.7;
-      transition: opacity 0.2s ease, color 0.2s ease;
+      transition: opacity 0.2s ease, color var(--transition);
       display: flex;
       align-items: center;
     }
@@ -222,6 +271,18 @@
 </head>
 <body>
 
+  <!-- ── THEME TOGGLE ── -->
+  <button class="theme-toggle" id="themeBtn" aria-label="Toggle dark mode">
+    <!-- moon: visible in light mode -->
+    <svg class="icon-moon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <!-- sun: visible in dark mode -->
+    <svg class="icon-sun" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 7a5 5 0 1 0 0 10A5 5 0 0 0 12 7zm0-5a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0V3a1 1 0 0 1 1-1zm0 17a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0v-1a1 1 0 0 1 1-1zm9-9a1 1 0 0 1 0 2h-1a1 1 0 0 1 0-2h1zM4 11a1 1 0 0 1 0 2H3a1 1 0 0 1 0-2h1zm14.95-6.364a1 1 0 0 1 0 1.414l-.707.707a1 1 0 1 1-1.414-1.414l.707-.707a1 1 0 0 1 1.414 0zM6.172 17.172a1 1 0 0 1 0 1.414l-.707.707a1 1 0 1 1-1.414-1.414l.707-.707a1 1 0 0 1 1.414 0zm12.02 2.121a1 1 0 0 1-1.414 0l-.707-.707a1 1 0 0 1 1.414-1.414l.707.707a1 1 0 0 1 0 1.414zM6.172 6.808a1 1 0 0 1-1.414 0l-.707-.707A1 1 0 0 1 5.465 4.687l.707.707a1 1 0 0 1 0 1.414z"/>
+    </svg>
+  </button>
+
   <!-- ── HERO ── -->
   <div class="hero">
     <img src="img/me.jpg" alt="Your Name" class="photo-frame">
@@ -236,21 +297,16 @@
     <p class="label">about katherine weinschenk</p>
     <p class="bio-text">
 
-      I'm a senior <span class="highlight">technical writer</span> at Modular,
-      working on documentation for AI infrastructure at a moment when that
-      infrastructure is changing very fast. It's an exciting place to be. We're
-      building the tools to make models run faster, faster, faster. At the same
-      time, we're having to craft our enablement for a rapidly-evolving
-      population of developers (<span
-      class="highlight">agents</span>, too).<br><br>
+      I spend my working hours as a <span class="highlight">Senior Technical
+      Writer</span> at Modular, documenting AI infrastructure that feels like
+      it's evolving by the hour. It's an exciting time and place, trying to
+      make high-performance tools accessible to humans (and the occasional AI
+      agent) without losing the plot.<br><br>
 
-      Let's be real. <span class="highlight">I don't know</span> what things
-      will look like in six months. For writers, developers — most of us,
-      really. Trying to keep up. Trying to have fun while I'm at it!<br><br>
-
-      <span class="highlight">Get to know me</span> through the media I like
-      below. When I'm not writing, reading, or watching, I'm gardening,
-      cooking, or playing volleyball. Sometimes vibe coding.
+      I'm lucky to be part of a brilliant writing community that keeps me
+      sharp, but I make sure to leave plenty of room for "offline" life. If I'm
+      not writing, I'm consuming, gardening, cooking, or playing volleyball.
+      Sometimes vibe coding.
   
     </p>
   </section>
@@ -324,6 +380,20 @@
 
   <script>
     document.getElementById('yr').textContent = new Date().getFullYear();
+
+    const html = document.documentElement;
+    const btn  = document.getElementById('themeBtn');
+
+    // restore saved preference
+    const saved = localStorage.getItem('theme');
+    if (saved) html.setAttribute('data-theme', saved);
+
+    btn.addEventListener('click', () => {
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      const next   = isDark ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    });
   </script>
 
 </body>
