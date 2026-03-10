@@ -189,12 +189,14 @@
     /* ── card ── */
     .media-card {
       overflow: hidden;
+      position: relative;
     }
 
     .media-card .cover {
       width: 100%;
       aspect-ratio: 2 / 3;
       overflow: hidden;
+      position: relative;
     }
 
     .media-card .cover img {
@@ -202,19 +204,52 @@
       height: 100%;
       object-fit: cover;
       display: block;
-      transition: filter var(--transition);
+      transition: transform 0.5s ease, filter var(--transition);
+    }
+
+    .media-card:hover .cover img {
+      transform: scale(1.04);
     }
 
     html[data-theme="dark"] .media-card .cover img {
       filter: brightness(0.85) saturate(0.85);
     }
 
-    .media-card .note {
-      border-top: 16px solid var(--bg);
-      font-size: 0.82rem;
-      color: var(--plum-mid);
+    /* overlay */
+    .media-card .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(61, 42, 48, 0.88);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      display: flex;
+      align-items: flex-end;
+      padding: 1rem 0.85rem;
+      pointer-events: none;
+    }
+
+    html[data-theme="dark"] .media-card .overlay {
+      background: rgba(237, 232, 227, 0.88);
+    }
+
+    html[data-theme="dark"] .media-card .overlay .note {
+      color: #3d2a30;
+    }
+
+    .media-card:hover .overlay {
+      opacity: 1;
+    }
+
+    .media-card .overlay .note {
+      font-size: 0.78rem;
+      color: #f0e6e0;
       line-height: 1.5;
-      transition: border-color var(--transition), color var(--transition);
+      transform: translateY(6px);
+      transition: transform 0.35s ease;
+    }
+
+    .media-card:hover .overlay .note {
+      transform: translateY(0);
     }
 
     /* ── footer ── */
@@ -304,7 +339,7 @@
       agent) without losing the plot.<br><br>
 
       I'm lucky to be part of a brilliant writing community that keeps me
-      sharp, but I make sure to leave plenty of room for "offline" life. If I'm
+      sharp, but I make sure to leave plenty of room to touch grass. If I'm
       not writing, I'm consuming, gardening, cooking, or playing volleyball.
       Sometimes vibe coding.
   
@@ -319,18 +354,24 @@
     <div class="media-grid">
 
       <div class="media-card">
-        <div class="cover"><img src="img/before.JPG" alt="..."></div>
-        <p class="note">because i feel like i'm there.</p>
+        <div class="cover">
+          <img src="img/before.JPG" alt="...">
+          <div class="overlay"><p class="note">because i feel like i'm there.</p></div>
+        </div>
       </div>
 
       <div class="media-card">
-        <div class="cover"><img src="img/another.JPG" alt="..."></div>
-        <p class="note">for hanging with the boys.</p>
+        <div class="cover">
+          <img src="img/another.JPG" alt="...">
+          <div class="overlay"><p class="note">for hanging with the boys.</p></div>
+        </div>
       </div>
 
       <div class="media-card">
-        <div class="cover"><img src="img/wages.JPG" alt="..."></div>
-        <p class="note">still relevant. </p>
+        <div class="cover">
+          <img src="img/wages.JPG" alt="...">
+          <div class="overlay"><p class="note">still relevant.</p></div>
+        </div>
       </div>
 
     </div>
@@ -343,18 +384,24 @@
     <div class="media-grid">
 
       <div class="media-card">
-        <div class="cover"><img src="img/melancholy.jpg" alt="..."></div>
-        <p class="note">incredible.</p>
+        <div class="cover">
+          <img src="img/melancholy.jpg" alt="...">
+          <div class="overlay"><p class="note">incredible.</p></div>
+        </div>
       </div>
 
       <div class="media-card">
-        <div class="cover"><img src="img/spirits.JPG" alt="..."></div>
-        <p class="note">families are complex.</p>
+        <div class="cover">
+          <img src="img/spirits.JPG" alt="...">
+          <div class="overlay"><p class="note">families are complex.</p></div>
+        </div>
       </div>
 
       <div class="media-card">
-        <div class="cover"><img src="img/dove.JPG" alt="..."></div>
-        <p class="note">being a cowboy is not easy.</p>
+        <div class="cover">
+          <img src="img/dove.JPG" alt="...">
+          <div class="overlay"><p class="note">being a cowboy is not easy.</p></div>
+        </div>
       </div>
 
     </div>
