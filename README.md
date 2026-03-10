@@ -1,2 +1,1 @@
-# katherine-weinschenk
-Personal site
+Nothing special. My personal website
