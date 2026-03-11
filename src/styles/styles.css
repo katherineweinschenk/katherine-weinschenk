@@ -1,0 +1,297 @@
+/* ── palette ── */
+:root {
+  --bg:        #ede8e3;
+  --plum:      #3d2a30;
+  --plum-mid:  #5a3d44;
+  --red:       #ff2c0b;
+  --muted:     #8c7e7a;
+  --transition: 0.4s ease;
+}
+
+html[data-theme="dark"] {
+  --bg:       #1c1017;
+  --plum:     #f0e6e0;
+  --plum-mid: #c9a9a0;
+  --red:      #ff4d2e;
+  --muted:    #7a5f65;
+}
+
+@font-face {
+  font-family: 'GeneralSans-Regular';
+  src: url('/fonts/GeneralSans-Regular.woff2') format('woff2');
+  font-weight: 300;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'GeneralSans-Medium';
+  src: url('/fonts/GeneralSans-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+  font-style: normal;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--plum);
+  font-family: 'GeneralSans-Regular', serif;
+  font-weight: 300;
+  font-size: 1.125rem;
+  line-height: 1.7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 1.5rem 6rem;
+  transition: background var(--transition), color var(--transition);
+}
+
+/* ── theme toggle ── */
+.theme-toggle {
+  position: fixed;
+  top: 1.4rem;
+  right: 1.5rem;
+  z-index: 100;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.3rem;
+  color: var(--muted);
+  opacity: 0.7;
+  transition: opacity 0.2s ease, color var(--transition);
+  line-height: 0;
+}
+.theme-toggle:hover { opacity: 1; }
+.theme-toggle svg { width: 17px; height: 17px; fill: currentColor; }
+
+.theme-toggle .icon-moon { display: block; }
+.theme-toggle .icon-sun  { display: none;  }
+html[data-theme="dark"] .theme-toggle .icon-moon { display: none;  }
+html[data-theme="dark"] .theme-toggle .icon-sun  { display: block; }
+
+/* ── shared section wrapper ── */
+.section {
+  width: 100%;
+  max-width: 680px;
+  padding: 5rem 0 0;
+}
+
+/* ── section label ── */
+.label {
+  font-family: 'GeneralSans-Regular', serif;
+  font-weight: 400;
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+  transition: color var(--transition);
+}
+
+/* ════════════════════════════
+   HERO — photo + name
+════════════════════════════ */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 7rem;
+  gap: 2rem;
+}
+
+.photo-frame {
+  width: auto;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+
+.photo-frame img {
+  object-fit: cover;
+  position: absolute;
+  inset: 0;
+  transition: filter var(--transition);
+}
+
+html[data-theme="dark"] .photo-frame img {
+  filter: brightness(0.85) saturate(0.85);
+}
+
+.hero-name {
+  font-family: 'GeneralSans-Medium', serif;
+  font-size: clamp(2.4rem, 6vw, 3.6rem);
+  font-weight: 700;
+  line-height: 1.05;
+  text-align: center;
+  color: var(--red);
+  transition: color var(--transition);
+}
+
+.hero > div {
+  margin-top: -4rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ════════════════════════════
+   BIO
+════════════════════════════ */
+.bio-text {
+  font-size: 1.15rem;
+  line-height: 1.85;
+  color: var(--plum);
+  transition: color var(--transition);
+}
+
+.bio-text .highlight {
+  color: var(--red);
+  transition: color var(--transition);
+}
+
+/* ════════════════════════════
+   MEDIA GRID
+════════════════════════════ */
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+@media (max-width: 540px) {
+  .media-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 340px) {
+  .media-grid { grid-template-columns: 1fr; }
+}
+
+/* ── card ── */
+.media-card {
+  overflow: hidden;
+  position: relative;
+}
+
+.media-card .cover {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  position: relative;
+}
+
+.media-card .cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease, filter var(--transition);
+}
+
+.media-card:hover .cover img {
+  transform: scale(1.04);
+}
+
+html[data-theme="dark"] .media-card .cover img {
+  filter: brightness(0.85) saturate(0.85);
+}
+
+/* overlay */
+.media-card .overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(61, 42, 48, 0.88);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  display: flex;
+  align-items: flex-end;
+  padding: 1rem 0.85rem;
+  pointer-events: none;
+}
+
+html[data-theme="dark"] .media-card .overlay {
+  background: rgba(237, 232, 227, 0.88);
+}
+
+html[data-theme="dark"] .media-card .overlay .note {
+  color: #3d2a30;
+}
+
+.media-card:hover .overlay {
+  opacity: 1;
+}
+
+.media-card .overlay .note {
+  font-size: 0.78rem;
+  color: #f0e6e0;
+  line-height: 1.5;
+  transform: translateY(6px);
+  transition: transform 0.35s ease;
+}
+
+.media-card:hover .overlay .note {
+  transform: translateY(0);
+}
+
+/* ── footer ── */
+footer {
+  margin-top: 6rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-align: center;
+  opacity: 0.6;
+  transition: color var(--transition);
+}
+
+.footer-icons {
+  display: flex;
+  justify-content: center;
+  gap: 1.1rem;
+  margin-top: 1rem;
+}
+
+.footer-icons a {
+  color: var(--muted);
+  opacity: 0.7;
+  transition: opacity 0.2s ease, color var(--transition);
+  display: flex;
+  align-items: center;
+}
+
+.footer-icons a:hover {
+  opacity: 1;
+  color: var(--plum);
+}
+
+.footer-icons svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+/* ── fade-in on load ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero, .divider, .section {
+  animation: fadeUp 0.7s ease both;
+}
+
+.hero      { animation-delay: 0.1s; }
+.divider   { animation-delay: 0.25s; }
+.section   { animation-delay: 0.35s; }

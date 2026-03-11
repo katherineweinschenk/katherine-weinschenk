@@ -1,1 +1,1 @@
-Nothing special. My personal website
+Nothing special. My personal website. Built with astro

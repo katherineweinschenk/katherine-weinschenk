@@ -1,0 +1,45 @@
+---
+const { img, alt, note } = Astro.props;
+---
+<div class="media-card">
+  <div class="cover">
+    <img src={img} alt={alt} loading="lazy" />
+    <div class="overlay">
+      <p class="note">{note}</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .media-card {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .cover img {
+    width: 100%;
+    display: block;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+  }
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(61, 42, 48, 0.8); /* Using your --plum color */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity var(--transition);
+    padding: 1.5rem;
+    text-align: center;
+  }
+  .media-card:hover .overlay {
+    opacity: 1;
+  }
+  .note {
+    color: #ede8e3; /* Your --bg color */
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+</style>
