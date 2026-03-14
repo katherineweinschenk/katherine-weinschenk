@@ -6,6 +6,7 @@
   --red:       #ff2c0b;
   --muted:     #8c7e7a;
   --transition: 0.4s ease;
+  --left-w:    390px;
 }
 
 html[data-theme="dark"] {
@@ -41,12 +42,11 @@ body {
   color: var(--plum);
   font-family: 'GeneralSans-Regular', serif;
   font-weight: 300;
-  font-size: 1.125rem;
+  font-size: 1rem;
   line-height: 1.7;
+  height: 100vh;
+  overflow: hidden;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0 1.5rem 6rem;
   transition: background var(--transition), color var(--transition);
 }
 
@@ -73,86 +73,71 @@ body {
 html[data-theme="dark"] .theme-toggle .icon-moon { display: none;  }
 html[data-theme="dark"] .theme-toggle .icon-sun  { display: block; }
 
-/* ── shared section wrapper ── */
-.section {
+/* ── app layout ── */
+.app {
+  display: flex;
   width: 100%;
-  max-width: 680px;
-  padding: 5rem 0 0;
+  height: 100vh;
 }
 
-/* ── section label ── */
-.label {
-  font-family: 'GeneralSans-Regular', serif;
-  font-weight: 400;
-  font-size: 0.7rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 1.5rem;
-  transition: color var(--transition);
-}
-
-/* ════════════════════════════
-   HERO — photo + name
-════════════════════════════ */
-.hero {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 7rem;
-  gap: 2rem;
-}
-
-.photo-frame {
-  width: auto;
-  height: 400px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  color: var(--muted);
-  font-size: 0.75rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  cursor: default;
-  position: relative;
+/* ── left panel ── */
+.left-panel {
+  width: var(--left-w);
+  flex-shrink: 0;
+  height: 100%;
   overflow: hidden;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  transition: background var(--transition);
+  animation: fadeUp 0.7s ease both;
+  animation-delay: 0.1s;
+  padding-bottom: 4.5rem; /* space for fixed footer */
 }
 
-.photo-frame img {
+
+/* ── profile photo ── */
+.me-photo {
+  width: calc(100% - 3rem);
+  margin: 1.5rem auto 0;
+  height: 300px;
   object-fit: cover;
-  position: absolute;
-  inset: 0;
+  object-position: center top;
+  display: block;
+  flex-shrink: 0;
   transition: filter var(--transition);
 }
 
-html[data-theme="dark"] .photo-frame img {
+html[data-theme="dark"] .me-photo {
   filter: brightness(0.85) saturate(0.85);
+}
+
+/* ── left panel text content ── */
+.left-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0 1.5rem 0;
+  margin-top: -1.4rem;      /* overlap photo bottom */
+  position: relative;
+  z-index: 1;
+  min-height: 0;
 }
 
 .hero-name {
   font-family: 'GeneralSans-Medium', serif;
-  font-size: clamp(2.4rem, 6vw, 3.6rem);
+  font-size: clamp(2rem, 3.5vw, 2.6rem);
   font-weight: 700;
   line-height: 1.05;
-  text-align: center;
   color: var(--red);
   transition: color var(--transition);
+  padding-top: 0.2rem;
 }
 
-.hero > div {
-  margin-top: -4rem;
-  position: relative;
-  z-index: 1;
-}
-
-/* ════════════════════════════
-   BIO
-════════════════════════════ */
 .bio-text {
-  font-size: 1.15rem;
-  line-height: 1.85;
+  font-size: 0.88rem;
+  line-height: 1.75;
   color: var(--plum);
   transition: color var(--transition);
 }
@@ -162,105 +147,78 @@ html[data-theme="dark"] .photo-frame img {
   transition: color var(--transition);
 }
 
-/* ════════════════════════════
-   MEDIA GRID
-════════════════════════════ */
-.media-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem;
-}
-
-@media (max-width: 540px) {
-  .media-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 340px) {
-  .media-grid { grid-template-columns: 1fr; }
-}
-
-/* ── card ── */
-.media-card {
-  overflow: hidden;
+/* ── tube panel ── */
+.tube-panel {
+  flex: 1;
   position: relative;
-}
-
-.media-card .cover {
-  width: 100%;
-  aspect-ratio: 2 / 3;
   overflow: hidden;
-  position: relative;
 }
 
-.media-card .cover img {
+#tube-canvas {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform 0.5s ease, filter var(--transition);
-}
-
-.media-card:hover .cover img {
-  transform: scale(1.04);
-}
-
-html[data-theme="dark"] .media-card .cover img {
-  filter: brightness(0.85) saturate(0.85);
-}
-
-/* overlay */
-.media-card .overlay {
   position: absolute;
   inset: 0;
-  background: rgba(61, 42, 48, 0.88);
-  opacity: 0;
-  transition: opacity 0.35s ease;
-  display: flex;
-  align-items: flex-end;
-  padding: 1rem 0.85rem;
+}
+
+/* ── hover overlay (centered over tube) ── */
+.hover-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  z-index: 5;
+  text-align: center;
 }
 
-html[data-theme="dark"] .media-card .overlay {
-  background: rgba(237, 232, 227, 0.88);
-}
-
-html[data-theme="dark"] .media-card .overlay .note {
-  color: #3d2a30;
-}
-
-.media-card:hover .overlay {
+.hover-overlay.visible {
   opacity: 1;
 }
 
-.media-card .overlay .note {
-  font-size: 0.78rem;
+.hover-note {
+  background: rgba(61, 42, 48, 0.88);
   color: #f0e6e0;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.82rem;
   line-height: 1.5;
-  transform: translateY(6px);
-  transition: transform 0.35s ease;
+  max-width: 220px;
+  font-family: 'GeneralSans-Regular', serif;
+  font-style: italic;
 }
 
-.media-card:hover .overlay .note {
-  transform: translateY(0);
+html[data-theme="dark"] .hover-note {
+  background: rgba(237, 232, 227, 0.88);
+  color: #3d2a30;
 }
 
-/* ── footer ── */
+/* ── footer (fixed, sits at bottom of left panel area) ── */
 footer {
-  margin-top: 6rem;
-  font-size: 0.75rem;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: var(--left-w);
+  padding: 0.8rem 1.5rem 1.1rem;
+  font-size: 0.67rem;
   color: var(--muted);
-  letter-spacing: 0.1em;
-  text-align: center;
-  opacity: 0.6;
-  transition: color var(--transition);
+  letter-spacing: 0.07em;
+  z-index: 20;
+  background: var(--bg);
+  border-top: 1px solid rgba(61, 42, 48, 0.08);
+  transition: color var(--transition), background var(--transition), border-color var(--transition);
+}
+
+html[data-theme="dark"] footer {
+  border-top-color: rgba(240, 230, 224, 0.06);
 }
 
 .footer-icons {
   display: flex;
-  justify-content: center;
-  gap: 1.1rem;
-  margin-top: 1rem;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-top: 0.55rem;
 }
 
 .footer-icons a {
@@ -277,21 +235,80 @@ footer {
 }
 
 .footer-icons svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   fill: currentColor;
 }
 
 /* ── fade-in on load ── */
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(18px); }
+  from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.hero, .divider, .section {
-  animation: fadeUp 0.7s ease both;
-}
+/* ═══════════════════════════════
+   MOBILE  (≤ 768px) — stacked scroll
+═══════════════════════════════ */
+@media (max-width: 768px) {
+  body {
+    height: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex-direction: column;
+  }
 
-.hero      { animation-delay: 0.1s; }
-.divider   { animation-delay: 0.25s; }
-.section   { animation-delay: 0.35s; }
+  .app {
+    flex-direction: column;
+    height: auto;
+    width: 100%;
+  }
+
+  .left-panel {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    padding-bottom: 0;
+    border-right: none;
+    animation: none;
+  }
+
+
+  .me-photo {
+    height: 60vw;
+    max-height: 320px;
+  }
+
+  .left-content {
+    margin-top: -1.4rem;
+    padding: 0 1.5rem 1.5rem;
+  }
+
+  .tube-panel {
+    width: 100%;
+    height: 90vw;
+    min-height: 380px;
+    flex: none;
+  }
+
+  /* footer becomes normal document flow on mobile */
+  footer {
+    position: static;
+    width: 100%;
+    border-top: 1px solid rgba(61, 42, 48, 0.08);
+    text-align: center;
+    padding: 1.2rem 1.5rem 1.5rem;
+  }
+
+  html[data-theme="dark"] footer {
+    border-top-color: rgba(240, 230, 224, 0.06);
+  }
+
+  .footer-icons {
+    justify-content: center;
+  }
+
+  .theme-toggle {
+    top: 1rem;
+    right: 1rem;
+  }
+}

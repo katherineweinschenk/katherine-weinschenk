@@ -10,16 +10,13 @@ import melancholy from '../assets/img/melancholy.jpg';
 import spirits from '../assets/img/spirits.jpg';
 import dove from '../assets/img/dove.jpg';
 
-const films = [
-  { src: before,    note: "because i feel like i'm there." },
-  { src: another,   note: 'for hanging with the boys.' },
-  { src: wages,     note: 'still relevant.' },
-];
-
-const books = [
-  { src: melancholy, note: 'incredible.' },
-  { src: spirits,    note: 'families are complex.' },
-  { src: dove,       note: 'being a cowboy is not easy.' },
+const cardData = [
+  { url: before.src,     note: "because i feel like i'm there." },
+  { url: another.src,    note: 'for hanging with the boys.'     },
+  { url: wages.src,      note: 'still relevant.'                },
+  { url: melancholy.src, note: 'incredible.'                    },
+  { url: spirits.src,    note: 'families are complex.'          },
+  { url: dove.src,       note: 'being a cowboy is not easy.'    },
 ];
 ---
 
@@ -27,59 +24,284 @@ const books = [
 
 <Layout title="katherine weinschenk">
 
-  <!-- ── HERO ── -->
-  <div class="hero">
-    <Image src={me} alt="Katherine Weinschenk" class="photo-frame" />
-    <div>
-      <h1 class="hero-name">heellloooooo</h1>
+  <div class="app">
+
+    <!-- ── LEFT PANEL ── -->
+    <div class="left-panel">
+      <Image src={me} alt="Katherine Weinschenk" class="me-photo" />
+
+      <div class="left-content">
+        <h1 class="hero-name">heellloooooo</h1>
+
+        <p class="bio-text">
+          I spend my working hours as a <span class="highlight">Senior Technical
+          Writer</span> at Modular, documenting AI infrastructure that feels like
+          it's evolving by the hour. It's an exciting time and place, trying to
+          make high-performance tools accessible to humans (and the occasional AI
+          agent) without losing the plot.<br /><br />
+
+          I'm lucky to be part of a brilliant writing community that keeps me
+          sharp, but I make sure to leave plenty of room to touch grass. If I'm
+          not writing, I'm consuming, gardening, cooking, or playing volleyball.
+          Sometimes vibe coding.
+        </p>
+      </div>
     </div>
+
+    <!-- ── TUBE PANEL ── -->
+    <div class="tube-panel">
+      <div id="tube-canvas"></div>
+      <div id="hover-overlay" class="hover-overlay">
+        <p class="hover-note"></p>
+      </div>
+    </div>
+
   </div>
 
-  <!-- ── BIO ── -->
-  <section class="section" id="about">
-    <p class="label">about katherine weinschenk</p>
-    <p class="bio-text">
-      I spend my working hours as a <span class="highlight">Senior Technical
-      Writer</span> at Modular, documenting AI infrastructure that feels like
-      it's evolving by the hour. It's an exciting time and place, trying to
-      make high-performance tools accessible to humans (and the occasional AI
-      agent) without losing the plot.<br /><br />
-
-      I'm lucky to be part of a brilliant writing community that keeps me
-      sharp, but I make sure to leave plenty of room to touch grass. If I'm
-      not writing, I'm consuming, gardening, cooking, or playing volleyball.
-      Sometimes vibe coding.
-    </p>
-  </section>
-
-  <!-- ── FILMS ── -->
-  <section class="section" id="media-films">
-    <p class="label">watch it</p>
-    <div class="media-grid">
-      {films.map(({ src, note }) => (
-        <div class="media-card">
-          <div class="cover">
-            <Image src={src} alt="" />
-            <div class="overlay"><p class="note">{note}</p></div>
-          </div>
-        </div>
-      ))}
-    </div>
-  </section>
-
-  <!-- ── BOOKS ── -->
-  <section class="section" id="media-books">
-    <p class="label">read it</p>
-    <div class="media-grid">
-      {books.map(({ src, note }) => (
-        <div class="media-card">
-          <div class="cover">
-            <Image src={src} alt="" />
-            <div class="overlay"><p class="note">{note}</p></div>
-          </div>
-        </div>
-      ))}
-    </div>
-  </section>
-
 </Layout>
+
+<script define:vars={{ cardData }} is:inline>
+  (function init() {
+    if (typeof window.THREE === 'undefined') {
+      setTimeout(init, 50);
+      return;
+    }
+
+    const THREE = window.THREE;
+    const container = document.getElementById('tube-canvas');
+    if (!container) return;
+
+    const hoverOverlay = document.getElementById('hover-overlay');
+    const hoverNoteEl  = hoverOverlay.querySelector('.hover-note');
+
+    /* ── theme helpers ── */
+    function isDark() {
+      return document.documentElement.getAttribute('data-theme') === 'dark';
+    }
+    function getBgHex()   { return isDark() ? 0x1c1017 : 0xede8e3; }
+    function getWireHex() { return isDark() ? 0xf0e6e0 : 0x3d2a30; }
+
+    /* ── scene ── */
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(getBgHex());
+    scene.fog = new THREE.Fog(getBgHex(), 14, 36);
+
+    const W = container.clientWidth;
+    const H = container.clientHeight;
+
+    const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 1000);
+    camera.position.set(0, 0, 20);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(W, H);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.domElement.style.cursor = 'grab';
+    container.appendChild(renderer.domElement);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+    const dir = new THREE.DirectionalLight(0xffffff, 0.5);
+    dir.position.set(10, 20, 10);
+    scene.add(dir);
+
+    /* ── tube group ── */
+    const tubeGroup = new THREE.Group();
+    scene.add(tubeGroup);
+
+    /* ── card geometry (portrait, like a poster/cover) ── */
+    const CARD_W  = 2.0;
+    const CARD_H  = 3.0;
+    const RADIUS  = 5.5;
+    const V_STEP  = 2.6;
+    const A_STEP  = (Math.PI * 2) / cardData.length;
+
+    /* border colors alternating red / plum */
+    const BORDER_COLORS = ['#ff2c0b', '#3d2a30', '#ff2c0b', '#3d2a30', '#ff2c0b', '#3d2a30'];
+
+    const cardGeo    = new THREE.PlaneGeometry(CARD_W, CARD_H);
+    const borderGeo  = new THREE.PlaneGeometry(CARD_W + 0.14, CARD_H + 0.14);
+    const loader     = new THREE.TextureLoader();
+    const cards      = [];
+
+    /* position helper */
+    function cardPos(i) {
+      const angle = i * A_STEP;
+      const y = (i * V_STEP) - ((cardData.length - 1) * V_STEP / 2);
+      return { x: Math.cos(angle) * RADIUS, y, z: Math.sin(angle) * RADIUS, angle };
+    }
+
+    cardData.forEach((data, i) => {
+      loader.load(data.url, (tex) => {
+        tex.minFilter = THREE.LinearFilter;
+        const mat  = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
+        const mesh = new THREE.Mesh(cardGeo, mat);
+
+        const { x, y, z } = cardPos(i);
+        mesh.position.set(x, y, z);
+        mesh.lookAt(0, y, 0);
+        mesh.rotateY(Math.PI);
+        mesh.rotateX((Math.random() - 0.5) * 0.08);
+        mesh.rotateZ((Math.random() - 0.5) * 0.08);
+
+        const bMat = new THREE.MeshBasicMaterial({
+          color: BORDER_COLORS[i % BORDER_COLORS.length],
+          side: THREE.BackSide
+        });
+        const bMesh = new THREE.Mesh(borderGeo, bMat);
+        bMesh.position.z = -0.05;
+        mesh.add(bMesh);
+
+        mesh.userData = { note: data.note };
+        tubeGroup.add(mesh);
+        cards.push(mesh);
+      });
+    });
+
+    /* ── wire lines ── */
+    let wireLine, axisLine;
+
+    function buildWires() {
+      if (wireLine)  tubeGroup.remove(wireLine);
+      if (axisLine)  tubeGroup.remove(axisLine);
+
+      const wCol = getWireHex();
+      const wMat = new THREE.LineBasicMaterial({ color: wCol, opacity: 0.45, transparent: true });
+
+      const pts = cardData.map((_, i) => {
+        const { x, y, z } = cardPos(i);
+        return new THREE.Vector3(x, y, z);
+      });
+      wireLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), wMat);
+      tubeGroup.add(wireLine);
+
+      const aMat = new THREE.LineBasicMaterial({ color: wCol, opacity: 0.2, transparent: true });
+      axisLine = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(0, -12, 0),
+          new THREE.Vector3(0,  12, 0)
+        ]),
+        aMat
+      );
+      tubeGroup.add(axisLine);
+    }
+    buildWires();
+
+    /* ── interaction state ── */
+    const mouse     = new THREE.Vector2();
+    const raycaster = new THREE.Raycaster();
+    let isDragging        = false;
+    let prevMouse         = { x: 0, y: 0 };
+    let mouseDownPos      = { x: 0, y: 0 };
+    let targetRotY        = 0;
+    let currentRotY       = 0;
+    let targetScrollPos   = 0;
+    let scrollPos         = 0;
+    let hoveredCard       = null;
+    let animId;
+
+    /* ── animation loop ── */
+    function animate() {
+      animId = requestAnimationFrame(animate);
+
+      currentRotY += (targetRotY - currentRotY) * 0.05;
+      tubeGroup.rotation.y = currentRotY;
+
+      scrollPos += (targetScrollPos - scrollPos) * 0.05;
+      targetScrollPos = Math.max(-9, Math.min(9, targetScrollPos));
+      tubeGroup.position.y = scrollPos;
+
+      if (!isDragging) targetRotY += 0.003;
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    /* ── theme observer ── */
+    new MutationObserver(() => {
+      const bg = new THREE.Color(getBgHex());
+      scene.background = bg;
+      scene.fog = new THREE.Fog(getBgHex(), 14, 36);
+      buildWires();
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+    /* ── event handlers ── */
+    function onResize() {
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    }
+
+    function updateMouse(e) {
+      const r = container.getBoundingClientRect();
+      mouse.x =  ((e.clientX - r.left) / r.width)  * 2 - 1;
+      mouse.y = -((e.clientY - r.top)  / r.height)  * 2 + 1;
+    }
+
+    function onMouseMove(e) {
+      updateMouse(e);
+      if (isDragging) {
+        targetRotY     += (e.clientX - prevMouse.x) * 0.005;
+        targetScrollPos += (e.clientY - prevMouse.y) * 0.05;
+        prevMouse = { x: e.clientX, y: e.clientY };
+        return;
+      }
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects(cards, false);
+      let frontHit = null;
+      for (const hit of hits) {
+        // Determine if the ray is hitting the front face.
+        // Transform the face normal to world space, then check if it
+        // faces toward the camera (dot with ray direction < 0 = front).
+        const worldNormal = hit.face.normal.clone()
+          .transformDirection(hit.object.matrixWorld)
+          .normalize();
+        const rayDir = hit.point.clone().sub(camera.position).normalize();
+        if (worldNormal.dot(rayDir) < 0) {
+          frontHit = hit.object;
+          break;
+        }
+      }
+      if (frontHit) {
+        if (hoveredCard !== frontHit) {
+          hoveredCard = frontHit;
+          hoverNoteEl.textContent = frontHit.userData.note;
+          hoverOverlay.classList.add('visible');
+        }
+      } else {
+        hoveredCard = null;
+        hoverOverlay.classList.remove('visible');
+      }
+    }
+
+    function onMouseDown(e) {
+      isDragging   = true;
+      mouseDownPos = { x: e.clientX, y: e.clientY };
+      prevMouse    = { x: e.clientX, y: e.clientY };
+      renderer.domElement.style.cursor = 'grabbing';
+    }
+
+    function onMouseUp(e) {
+      isDragging = false;
+      renderer.domElement.style.cursor = 'grab';
+    }
+
+    function onWheel(e) {
+      e.preventDefault();
+      targetScrollPos += e.deltaY * 0.01;
+      targetRotY      += e.deltaY * 0.001;
+    }
+
+    function onLeave() {
+      hoveredCard = null;
+      hoverOverlay.classList.remove('visible');
+    }
+
+    window.addEventListener('resize', onResize);
+    container.addEventListener('mousemove',  onMouseMove);
+    container.addEventListener('mousedown',  onMouseDown);
+    window.addEventListener('mouseup',       onMouseUp);
+    container.addEventListener('wheel',      onWheel, { passive: false });
+    container.addEventListener('mouseleave', onLeave);
+  })();
+</script>
